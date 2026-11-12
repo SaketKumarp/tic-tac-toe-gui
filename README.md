@@ -1,79 +1,104 @@
 # Tic Tac Toe GUI 🎮
 
-A simple, interactive **Tic Tac Toe** game built with Python and Tkinter. The project is intended to provide a graphical way for two players to play the classic X and O game.
+A polished desktop Tic Tac Toe game built with **Python**, **CustomTkinter**, and a computer opponent powered by **minimax with alpha-beta pruning**.
 
-## Overview
+## Features
 
-Tic Tac Toe is a two-player strategy game played on a 3 × 3 grid. Players take turns marking an empty cell with **X** or **O**. The first player to get three marks in a horizontal, vertical, or diagonal line wins. If all nine cells are filled without a winner, the game ends in a draw.
+- Player vs Player and Player vs Computer modes
+- Easy (random), Medium (win/block), and Hard (minimax + alpha-beta pruning) AI
+- Choose X or O and choose who starts
+- Custom player names
+- Undo, rematch, and return-to-menu controls
+- Persistent lifetime scoreboard and recent game history in `scores.json`
+- Dark interface, hover feedback, result banner, and animated winning line
+- Optional system sound effects
+- Separated game rules, AI, UI, and storage modules
+- Unit tests with pytest
 
-## Planned Features
+## Preview
 
-- Graphical interface built with Python's Tkinter library
-- Two-player gameplay (X vs O)
-- 3 × 3 interactive game board
-- Turn tracking
-- Win and draw detection
-- Option to restart or play another round
+Screenshots and gameplay GIFs can be added to the `assets/` directory.
 
-> **Project status:** README and repository setup are in place. The Python implementation and screenshots still need to be added.
+## Requirements
 
-## Tech Stack
+- Python 3.10+
+- Tk support available in your Python installation
 
-- **Language:** Python 3
-- **GUI:** Tkinter (Python standard library)
+## Installation
 
-## Getting Started
-
-### Prerequisites
-
-- Python 3 installed
-- Tkinter available with your Python installation
-
-Check your Python installation:
+Clone the repository and enter its directory:
 
 ```bash
-python3 --version
+git clone https://github.com/SaketKumarp/tic-tac-toe-gui.git
+cd tic-tac-toe-gui
 ```
 
-### Run the Game
-
-After the game source file has been added, run it from the project directory:
+Create and activate a virtual environment (recommended):
 
 ```bash
-python3 main.py
+python3 -m venv .venv
+source .venv/bin/activate       # macOS / Linux
+# .venv\\Scripts\\activate    # Windows
+```
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+## Run
+
+```bash
+python main.py
+```
+
+## Run Tests
+
+```bash
+pytest -q
 ```
 
 ## Project Structure
 
-The intended project structure is:
-
 ```text
 tic-tac-toe-gui/
-├── main.py          # Game logic and Tkinter interface
-├── README.md        # Project documentation
-└── .gitignore       # Files Git should ignore
+├── main.py
+├── game/
+│   ├── __init__.py
+│   ├── board.py       # Pure board rules and win/draw detection
+│   ├── ai.py          # Easy, Medium, and Hard AI
+│   ├── ui.py          # CustomTkinter screens and interaction
+│   ├── sounds.py      # Optional system sound helper
+│   └── storage.py     # JSON scoreboard and history
+├── tests/
+│   └── test_board.py
+├── assets/
+├── requirements.txt
+├── .gitignore
+├── LICENSE
+└── README.md
 ```
 
-## How to Play
+## How Hard AI Works
 
-1. Launch the application.
-2. Player X takes the first turn.
-3. Players take turns selecting empty cells.
-4. Get three matching marks in a row, column, or diagonal to win.
-5. If the board fills with no winning combination, the game is a draw.
+Hard mode uses the **minimax** algorithm. It explores possible future moves, scores terminal positions, and chooses the move with the best outcome. **Alpha-beta pruning** skips branches that cannot affect the final decision, reducing the number of positions evaluated. On a standard 3 × 3 board, the search is small enough to run immediately and the AI cannot be forced to lose.
 
-## Future Improvements
+## Saved Data
 
-- Single-player mode against a computer
-- Difficulty levels
-- Score tracking
-- Improved themes and animations
-- Keyboard accessibility
+The game creates `scores.json` in the project root after the first completed match. It stores lifetime X wins, O wins, draws, and the 50 most recent results. This file is intentionally ignored by Git so personal scores stay local.
 
-## Contributing
+## Packaging (macOS)
 
-Contributions and suggestions are welcome. Feel free to fork the repository and open a pull request.
+You can build a standalone app with PyInstaller:
+
+```bash
+pip install pyinstaller
+pyinstaller --windowed --name "TicTacToe" main.py
+```
+
+The generated application will be placed in `dist/`.
 
 ## License
 
-A license has not been specified yet. Add a license file if you want to define reuse and distribution permissions.
+This project is licensed under the MIT License. See [LICENSE](LICENSE).
