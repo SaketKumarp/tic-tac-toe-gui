@@ -123,7 +123,11 @@ class TicTacToeApp(ctk.CTk):
         self.sound_enabled = self.sound_var.get()
         x_name = self.x_name_entry.get().strip() or "Player 1"
         o_name = self.o_name_entry.get().strip() or ("Computer" if self.mode == "vs Computer" else "Player 2")
-        self.names = {X: x_name, O: o_name}
+        if self.mode == "vs Computer":
+            other_symbol = O if self.human_symbol == X else X
+            self.names = {self.human_symbol: x_name, other_symbol: "Computer"}
+        else:
+            self.names = {X: x_name, O: o_name}
         self._build_game_screen(self.first_var.get())
         if self.mode == "vs Computer" and self.board.current_player != self.human_symbol:
             self.after(350, self._computer_turn)
