@@ -1,32 +1,37 @@
-# Tic Tac Toe GUI 🎮
+# Tic Tac Toe GUI
 
-A polished desktop Tic Tac Toe game built with **Python** and **CustomTkinter**. Play against another person or challenge a computer opponent powered by **minimax with alpha-beta pruning**.
+A desktop Tic Tac Toe game built with **Python** and **CustomTkinter**. Play locally with two people on the same computer: Player 1 uses **X** and Player 2 uses **O**.
+
+The game includes a dark interface, animated winning line, confetti celebration, and sound effects for wins and draws.
 
 ## Features
 
-- **Two game modes:** Player vs Player and Player vs Computer
-- **Three AI difficulties:**
-  - Easy — chooses a random legal move
-  - Medium — looks for an immediate win or blocks an opponent's immediate win
-  - Hard — uses minimax with alpha-beta pruning; it cannot be forced to lose on the classic 3 × 3 board
-- Choose X or O and choose who takes the first turn
-- Custom player names
-- Undo, rematch, and return-to-menu controls
-- Persistent lifetime scoreboard and recent match history in `scores.json`
-- Dark interface with hover feedback and animated winning line
-- **Win celebration:** animated confetti, a pulsing champion banner, and a generated applause/clapping sound
-- Separate draw sound and optional sound-effects toggle
-- Cross-platform sound handling for macOS and Windows, with a system-bell fallback
-- Modular code structure and pytest unit tests
+- **Two-player gameplay:** Player 1 (X) vs Player 2 (O)
+- Custom names for both players
+- Choose whether X or O takes the first turn
+- Clear turn indicator and win/draw detection
+- Undo the most recent move
+- Rematch and return-to-menu controls
+- Lifetime scoreboard and recent match history saved locally in `scores.json`
+- Animated winning line
+- Win celebration with falling confetti and a pulsing champion banner
+- Generated applause/clapping sound effect for a win
+- Separate draw sound and an option to toggle sound effects
+- Cross-platform sound playback support for macOS and Windows, with a system-bell fallback
+- Modular Python code and unit tests
 
 ## Preview
 
-Add screenshots or gameplay recordings to the `assets/` directory and link them here.
+Add screenshots or a short gameplay recording to the `assets/` directory and embed them here:
+
+```md
+![Tic Tac Toe gameplay](assets/gameplay.png)
+```
 
 ## Requirements
 
 - Python 3.10 or newer
-- Tk support available in your Python installation
+- Tkinter support in your Python installation
 - Dependencies listed in `requirements.txt`
 
 ## Installation
@@ -38,7 +43,7 @@ git clone https://github.com/SaketKumarp/tic-tac-toe-gui.git
 cd tic-tac-toe-gui
 ```
 
-### 2. Create a virtual environment
+### 2. Create and activate a virtual environment
 
 **macOS / Linux**
 
@@ -51,55 +56,22 @@ source .venv/bin/activate
 
 ```bat
 py -m venv .venv
-.venv\Scripts\activate
+.venv\\Scripts\\activate
 ```
 
 **Windows — PowerShell**
 
 ```powershell
 py -m venv .venv
-.venv\Scripts\Activate.ps1
+.venv\\Scripts\\Activate.ps1
 ```
 
 ### 3. Install dependencies
 
 ```bash
+python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
-
-## Tkinter setup and troubleshooting
-
-CustomTkinter uses Tkinter underneath. Check that Tkinter is available before launching the game:
-
-```bash
-python -m tkinter
-```
-
-A small Tk test window should appear.
-
-- **macOS with Homebrew Python:** if you see `ModuleNotFoundError: No module named '_tkinter'`, install the matching Tk package. For Python 3.13, run `brew install python-tk@3.13`. If you use another Python version, install the matching `python-tk@<version>` formula. Recreate your virtual environment after installing it.
-- **Windows:** install Python from [python.org](https://www.python.org/downloads/windows/) and ensure the Tcl/Tk component is selected. Then recreate the virtual environment if it was created with a different Python installation.
-- **Ubuntu / Debian:** install Tk support with `sudo apt install python3-tk` for the system Python you are using.
-
-### VS Code interpreter
-
-If VS Code reports an interpreter error or uses a different Python installation:
-
-1. Open the `tic-tac-toe-gui` folder itself in VS Code.
-2. Press `Cmd + Shift + P` on macOS or `Ctrl + Shift + P` on Windows.
-3. Choose **Python: Select Interpreter**.
-4. Select the interpreter inside this project's `.venv` folder:
-   - macOS / Linux: `.venv/bin/python`
-   - Windows: `.venv\\Scripts\\python.exe`
-
-In the VS Code terminal, activate the environment and verify it:
-
-```bash
-python --version
-python -c "import sys; print(sys.executable)"
-```
-
-The printed executable path should point to this project's `.venv` directory.
 
 ## Run the game
 
@@ -109,11 +81,50 @@ From the project root, with the virtual environment activated:
 python main.py
 ```
 
-## Run tests
+On Windows, you can also use `py main.py`.
+
+## Tkinter setup and troubleshooting
+
+CustomTkinter uses Tkinter underneath. Verify that Tkinter is available:
 
 ```bash
-python -m pytest -q
+python -m tkinter
 ```
+
+A small test window should open.
+
+- **macOS with Homebrew Python:** If Python reports `No module named '_tkinter'`, install the matching Tk package. For Python 3.13, run `brew install python-tk@3.13`. Use the formula matching your Python version, then recreate the virtual environment.
+- **Windows:** Install Python from [python.org](https://www.python.org/downloads/windows/) and make sure the Tcl/Tk and IDLE option is selected. Recreate the virtual environment if you changed Python installations.
+- **Ubuntu / Debian:** Install Tk support with `sudo apt install python3-tk` for the Python version you use.
+
+### VS Code interpreter
+
+If VS Code uses the wrong Python installation:
+
+1. Open the project folder in VS Code.
+2. Open the Command Palette with **Cmd + Shift + P** (macOS) or **Ctrl + Shift + P** (Windows).
+3. Select **Python: Select Interpreter**.
+4. Choose the interpreter inside this project's `.venv`:
+   - macOS / Linux: `.venv/bin/python`
+   - Windows: `.venv\\Scripts\\python.exe`
+
+Verify the selected interpreter:
+
+```bash
+python --version
+python -c "import sys; print(sys.executable)"
+```
+
+The executable path should point to this project's `.venv` directory.
+
+## How to play
+
+1. Start the game and enter names for Player 1 and Player 2.
+2. Choose whether **X** or **O** goes first.
+3. Players take turns selecting an empty square.
+4. The first player to place three marks in a horizontal, vertical, or diagonal line wins.
+5. If all nine squares are filled without a winning line, the game ends in a draw.
+6. Use **Undo** to take back the latest move, **Rematch** to play again, or **Menu** to change the setup.
 
 ## Project structure
 
@@ -122,38 +133,37 @@ tic-tac-toe-gui/
 ├── main.py
 ├── game/
 │   ├── __init__.py
-│   ├── board.py       # Board state, legal moves, and win/draw detection
-│   ├── ai.py          # Easy, Medium, and Hard computer opponents
-│   ├── ui.py          # CustomTkinter screens, gameplay, and animations
-│   ├── sounds.py      # Generated applause and platform sound playback
-│   └── storage.py     # JSON scoreboard and match history
+│   ├── board.py       # Board state, legal moves, win/draw detection
+│   ├── ui.py          # CustomTkinter interface and game animations
+│   ├── sounds.py      # Generated applause and sound playback
+│   └── storage.py     # Local scoreboard and match history
 ├── tests/
-│   └── test_board.py
-├── assets/
+│   └── test_board.py  # Unit tests for game rules
+├── assets/            # Optional screenshots and media
 ├── requirements.txt
 ├── .gitignore
 ├── LICENSE
 └── README.md
 ```
 
-## How Hard AI works
+## Run tests
 
-Hard mode uses the **minimax** algorithm. It explores possible future moves, scores terminal positions, and chooses the move with the best outcome. **Alpha-beta pruning** skips branches that cannot affect the final decision, reducing the number of positions evaluated. On a standard 3 × 3 board, the search is small enough to run immediately and the AI cannot be forced to lose.
-
-## Saved data
-
-The game creates `scores.json` in the project root after the first completed match. It stores lifetime X wins, O wins, draws, and recent results. This file is intentionally ignored by Git so personal scores stay local.
-
-## Packaging (optional)
-
-You can experiment with building a standalone application using PyInstaller:
+Install the dependencies, then run:
 
 ```bash
-python -m pip install pyinstaller
-pyinstaller --windowed --name TicTacToe main.py
+python -m pytest -q
 ```
 
-The generated build will be placed in the `dist/` directory. Build separately on each target operating system.
+## Saved game data
+
+After a completed match, the game creates `scores.json` in the project root. It stores the lifetime wins for X and O, draw count, and recent match results. The file is local to your machine and should remain untracked by Git.
+
+## Technologies
+
+- **Python** — game logic and application code
+- **CustomTkinter** — desktop graphical interface
+- **Tkinter Canvas** — confetti and winning-line animations
+- **pytest** — automated tests
 
 ## License
 
