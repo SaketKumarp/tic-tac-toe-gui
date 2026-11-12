@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import random
+
 import customtkinter as ctk
 from tkinter import Canvas
 
@@ -148,6 +150,11 @@ class TicTacToeApp(ctk.CTk):
         self.status_label.pack(pady=(30, 8))
         self.result_label = ctk.CTkLabel(frame, text="", font=("Helvetica", 14), text_color=WIN_COLOR)
         self.result_label.pack(pady=(0, 10))
+        self.celebration_canvas = Canvas(frame, width=500, height=52, bg=BG,
+                                         highlightthickness=0, bd=0)
+        self.celebration_canvas.pack_forget()
+        self.confetti_particles: list[dict] = []
+        self.confetti_after_id = None
         self.score_label = ctk.CTkLabel(frame, text="", font=("Helvetica", 13), text_color=MUTED)
         self.score_label.pack(pady=(0, 20))
 
@@ -211,17 +218,69 @@ class TicTacToeApp(ctk.CTk):
 
     def _finish_game(self, result: str) -> None:
         if result == "Draw":
-            self.result_label.configure(text="It's a draw! Good game.", text_color=MUTED)
+            self.result_label.configure(
+                text="🤝  IT'S A DRAW!  GOOD GAME!",
+                text_color="#f6c85f",
+                font=("Helvetica", 17, "bold"),
+            )
+            play_sound(self, self.sound_enabled, kind="draw")
         else:
-            self.result_label.configure(text=f"{self.names[result]} ({result}) wins!", text_color=WIN_COLOR)
+            winner_name = self.names[result]
+            self.result_label.configure(
+                text=f"🏆  {winner_name} ({result}) IS THE CHAMPION!  🎉",
+                text_color="#ffd166",
+                font=("Helvetica", 17, "bold"),
+            )
             for index in self.board.winning_combo or ():
-                self.buttons[index].configure(text_color=WIN_COLOR, fg_color="#203d36")
+                self.buttons[index].configure(text_color="#ffd166", fg_color="#3b3040")
+            self._start_confetti()
             self._animate_winning_line()
+            play_sound(self, self.sound_enabled, kind="win")
+
         self.saved_data = record_result(result, self.names, self.mode)
         self._update_labels()
-        play_sound(self, self.sound_enabled)
         for button in self.buttons:
             button.configure(hover=False)
+
+    def _start_confetti(self) -> None:
+        """Show a short burst of falling confetti below the result message."""
+        canvas = self.celebration_canvas
+        canvas.pack(fill="x", pady=(0, 4), before=self.score_label)
+        canvas.delete("all")
+        colors = ["#ffd166", "#06d6a0", "#7c5cff", "#54c7ec", "#ff6b6b", "#ffffff"]
+        self.confetti_particles = [
+            {
+                "x": random.randint(8, 492),
+                "y": random.randint(-52, 0),
+                "speed": random.uniform(2.0, 5.5),
+                "drift": random.uniform(-1.8, 1.8),
+                "size": random.randint(4, 8),
+                "color": random.choice(colors),
+            }
+            for _ in range(65)
+        ]
+        self._animate_confetti(0)
+
+    def _animate_confetti(self, frame: int) -> None:
+        if not self.winfo_exists() or not self.celebration_canvas.winfo_exists():
+            return
+        canvas = self.celebration_canvas
+        canvas.delete("confetti")
+        for particle in self.confetti_particles:
+            particle["y"] += particle["speed"]
+            particle["x"] += particle["drift"]
+            if particle["y"] > 56:
+                particle["y"] = random.randint(-18, -4)
+                particle["x"] = random.randint(8, 492)
+            x, y, size = particle["x"], particle["y"], particle["size"]
+            canvas.create_oval(x, y, x + size, y + size,
+                               fill=particle["color"], outline="", tags="confetti")
+        if frame < 44 and self.board.winner:
+            self.confetti_after_id = self.after(35, lambda: self._animate_confetti(frame + 1))
+        else:
+            canvas.delete("confetti")
+            canvas.pack_forget()
+            self.confetti_after_id = None
 
     def _animate_winning_line(self) -> None:
         if not self.board.winning_combo:
