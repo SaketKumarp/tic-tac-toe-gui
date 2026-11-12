@@ -1,6 +1,5 @@
-"""Unit tests for board rules and the computer opponent."""
+"""Unit tests for two-player Tic Tac Toe board rules."""
 
-from game.ai import EASY, HARD, MEDIUM, choose_move
 from game.board import GameBoard, O, X
 
 
@@ -50,44 +49,8 @@ def test_undo_restores_previous_player() -> None:
     assert board.cells[1] == ""
 
 
-def test_easy_medium_and_hard_return_legal_moves() -> None:
-    for difficulty in (EASY, MEDIUM, HARD):
-        board = GameBoard()
-        move = choose_move(board, difficulty, X)
-        assert move in board.available_moves()
-
-
-def test_hard_ai_takes_winning_move() -> None:
+def test_reset_can_choose_starting_player() -> None:
     board = GameBoard()
-    board.cells = [X, X, "", O, O, "", "", "", ""]
-    board.current_player = X
-    assert choose_move(board, HARD, X) == 2
-
-
-def test_hard_ai_blocks_immediate_loss() -> None:
-    board = GameBoard()
-    board.cells = [O, O, "", X, "", "", "", "", ""]
-    board.current_player = X
-    assert choose_move(board, HARD, X) == 2
-
-
-def test_hard_ai_never_loses_against_any_opponent_reply() -> None:
-    """Explore opponent replies while letting Hard AI choose its optimal move."""
-    def explore(position: GameBoard) -> bool:
-        if position.winner == O:
-            return False
-        if position.is_over:
-            return True
-        if position.current_player == X:
-            move = choose_move(position, HARD, X)
-            next_position = position.clone()
-            next_position.make_move(move)
-            return explore(next_position)
-        for move in position.available_moves():
-            next_position = position.clone()
-            next_position.make_move(move)
-            if not explore(next_position):
-                return False
-        return True
-
-    assert explore(GameBoard())
+    board.reset(O)
+    assert board.current_player == O
+    assert board.cells == [""] * 9
