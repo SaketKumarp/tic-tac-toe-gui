@@ -7,7 +7,6 @@ import random
 import customtkinter as ctk
 from tkinter import Canvas
 
-from game.ai import DIFFICULTIES, HARD, choose_move
 from game.board import GameBoard, O, X
 from game.sounds import play_sound
 from game.storage import load_data, record_result
@@ -23,7 +22,7 @@ MUTED = "#aab2c5"
 
 
 class TicTacToeApp(ctk.CTk):
-    """Own the application screens and coordinate board, AI, and storage."""
+    """Own the two-player application screens and coordinate board and storage."""
 
     def __init__(self) -> None:
         super().__init__()
@@ -35,9 +34,6 @@ class TicTacToeApp(ctk.CTk):
         self.configure(fg_color=BG)
         self.board = GameBoard()
         self.saved_data = load_data()
-        self.mode = "PvP"
-        self.difficulty = HARD
-        self.human_symbol = X
         self.names = {X: "Player 1", O: "Player 2"}
         self.sound_enabled = True
         self.buttons: list[ctk.CTkButton] = []
@@ -68,12 +64,6 @@ class TicTacToeApp(ctk.CTk):
         ctk.CTkLabel(frame, text="A little strategy goes a long way.",
                      font=("Helvetica", 14), text_color=MUTED).pack(pady=(0, 22))
 
-        ctk.CTkLabel(frame, text="GAME MODE", text_color=MUTED,
-                     font=("Helvetica", 12, "bold")).pack(anchor="w", padx=18)
-        self.mode_var = ctk.StringVar(value="PvP")
-        ctk.CTkSegmentedButton(frame, values=["PvP", "vs Computer"],
-                               variable=self.mode_var, command=self._mode_changed).pack(fill="x", padx=18, pady=(6, 14))
-
         ctk.CTkLabel(frame, text="PLAYER NAMES", text_color=MUTED,
                      font=("Helvetica", 12, "bold")).pack(anchor="w", padx=18)
         names_frame = ctk.CTkFrame(frame, fg_color="transparent")
@@ -81,7 +71,7 @@ class TicTacToeApp(ctk.CTk):
         self.x_name_entry = ctk.CTkEntry(names_frame, placeholder_text="Player X name")
         self.x_name_entry.insert(0, "Player 1")
         self.x_name_entry.pack(side="left", expand=True, fill="x", padx=(0, 6))
-        self.o_name_entry = ctk.CTkEntry(names_frame, placeholder_text="Player O / Computer")
+        self.o_name_entry = ctk.CTkEntry(names_frame, placeholder_text="Player 2 (O)")
         self.o_name_entry.insert(0, "Player 2")
         self.o_name_entry.pack(side="left", expand=True, fill="x", padx=(6, 0))
 
@@ -89,21 +79,11 @@ class TicTacToeApp(ctk.CTk):
         settings.pack(fill="x", padx=18, pady=14)
         ctk.CTkLabel(settings, text="GAME SETTINGS", text_color=MUTED,
                      font=("Helvetica", 12, "bold")).pack(anchor="w", padx=14, pady=(12, 4))
-        self.difficulty_var = ctk.StringVar(value=HARD)
-        self.symbol_var = ctk.StringVar(value=X)
         self.first_var = ctk.StringVar(value="X")
-        self.difficulty_menu = ctk.CTkOptionMenu(settings, values=list(DIFFICULTIES), variable=self.difficulty_var)
-        self.difficulty_menu.pack(fill="x", padx=14, pady=5)
-        ctk.CTkLabel(settings, text="Computer difficulty (used in vs Computer mode)",
-                     text_color=MUTED, font=("Helvetica", 11)).pack(anchor="w", padx=14)
         row = ctk.CTkFrame(settings, fg_color="transparent")
-        row.pack(fill="x", padx=14, pady=8)
-        ctk.CTkLabel(row, text="Your mark", text_color=TEXT).pack(side="left")
-        ctk.CTkSegmentedButton(row, values=["X", "O"], variable=self.symbol_var).pack(side="right")
-        row2 = ctk.CTkFrame(settings, fg_color="transparent")
-        row2.pack(fill="x", padx=14, pady=(0, 10))
-        ctk.CTkLabel(row2, text="First turn", text_color=TEXT).pack(side="left")
-        ctk.CTkSegmentedButton(row2, values=["X", "O"], variable=self.first_var).pack(side="right")
+        row.pack(fill="x", padx=14, pady=10)
+        ctk.CTkLabel(row, text="First turn", text_color=TEXT).pack(side="left")
+        ctk.CTkSegmentedButton(row, values=["X", "O"], variable=self.first_var).pack(side="right")
 
         self.sound_var = ctk.BooleanVar(value=True)
         ctk.CTkCheckBox(frame, text="Sound effects", variable=self.sound_var,
@@ -114,31 +94,13 @@ class TicTacToeApp(ctk.CTk):
         scores = self.saved_data["scores"]
         ctk.CTkLabel(frame, text=f"Lifetime score  ·  X {scores['X']}     O {scores['O']}     Draws {scores['Draw']}",
                      text_color=MUTED, font=("Helvetica", 12)).pack(pady=8)
-        self._mode_changed(self.mode_var.get())
-
-    def _mode_changed(self, value: str) -> None:
-        if hasattr(self, "difficulty_menu"):
-            self.difficulty_menu.configure(state="normal" if value == "vs Computer" else "disabled")
-            self.o_name_entry.configure(state="normal" if value == "PvP" else "disabled")
-            if value == "vs Computer":
-                self.o_name_entry.delete(0, "end")
-                self.o_name_entry.insert(0, "Computer")
 
     def _start_game(self) -> None:
-        self.mode = self.mode_var.get()
-        self.difficulty = self.difficulty_var.get()
-        self.human_symbol = self.symbol_var.get()
         self.sound_enabled = self.sound_var.get()
         x_name = self.x_name_entry.get().strip() or "Player 1"
-        o_name = self.o_name_entry.get().strip() or ("Computer" if self.mode == "vs Computer" else "Player 2")
-        if self.mode == "vs Computer":
-            other_symbol = O if self.human_symbol == X else X
-            self.names = {self.human_symbol: x_name, other_symbol: "Computer"}
-        else:
-            self.names = {X: x_name, O: o_name}
+        o_name = self.o_name_entry.get().strip() or "Player 2"
+        self.names = {X: x_name, O: o_name}
         self._build_game_screen(self.first_var.get())
-        if self.mode == "vs Computer" and self.board.current_player != self.human_symbol:
-            self.after(350, self._computer_turn)
 
     def _build_game_screen(self, starting_player: str) -> None:
         self._clear_screen()
@@ -195,11 +157,7 @@ class TicTacToeApp(ctk.CTk):
     def _on_cell_click(self, index: int) -> None:
         if self.board.is_over or self.board.cells[index]:
             return
-        if self.mode == "vs Computer" and self.board.current_player != self.human_symbol:
-            return
         self._play_move(index)
-        if not self.board.is_over and self.mode == "vs Computer":
-            self.after(300, self._computer_turn)
 
     def _play_move(self, index: int) -> None:
         player = self.board.current_player
@@ -213,14 +171,6 @@ class TicTacToeApp(ctk.CTk):
             self._finish_game(self.board.winner)
         elif self.board.is_draw:
             self._finish_game("Draw")
-
-    def _computer_turn(self) -> None:
-        if self.board.is_over or self.mode != "vs Computer":
-            return
-        if self.board.current_player == self.human_symbol:
-            return
-        move = choose_move(self.board, self.difficulty, self.board.current_player)
-        self._play_move(move)
 
     def _finish_game(self, result: str) -> None:
         if result == "Draw":
@@ -244,7 +194,7 @@ class TicTacToeApp(ctk.CTk):
             self._pulse_winner_banner(0)
             play_sound(self, self.sound_enabled, kind="win")
 
-        self.saved_data = record_result(result, self.names, self.mode)
+        self.saved_data = record_result(result, self.names, "PvP")
         self._update_labels()
         for button in self.buttons:
             button.configure(hover=False)
@@ -340,8 +290,7 @@ class TicTacToeApp(ctk.CTk):
     def _undo(self) -> None:
         if not self.board.move_history or self.board.is_over:
             return
-        count = 2 if self.mode == "vs Computer" and len(self.board.move_history) >= 2 else 1
-        for _ in range(count):
+        for _ in range(1):
             index = self.board.undo_move()
             if index is None:
                 break
