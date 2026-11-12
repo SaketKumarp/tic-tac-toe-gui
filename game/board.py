@@ -87,18 +87,6 @@ class GameBoard:
         self.winning_combo = None
         self.move_history.clear()
 
-    def clone(self) -> "GameBoard":
-        """Return an independent copy, useful for AI search."""
-        return GameBoard(
-            size=self.size,
-            win_length=self.win_length,
-            cells=self.cells.copy(),
-            current_player=self.current_player,
-            winner=self.winner,
-            winning_combo=self.winning_combo,
-            move_history=self.move_history.copy(),
-        )
-
     def _find_winning_combo(self, player: str) -> Optional[tuple[int, ...]]:
         """Find a winning row, column, or diagonal for player."""
         n, k = self.size, self.win_length
