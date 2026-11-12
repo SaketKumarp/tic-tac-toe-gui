@@ -69,3 +69,25 @@ def test_hard_ai_blocks_immediate_loss() -> None:
     board.cells = [O, O, "", X, "", "", "", "", ""]
     board.current_player = X
     assert choose_move(board, HARD, X) == 2
+
+
+def test_hard_ai_never_loses_against_any_opponent_reply() -> None:
+    """Explore opponent replies while letting Hard AI choose its optimal move."""
+    def explore(position: GameBoard) -> bool:
+        if position.winner == O:
+            return False
+        if position.is_over:
+            return True
+        if position.current_player == X:
+            move = choose_move(position, HARD, X)
+            next_position = position.clone()
+            next_position.make_move(move)
+            return explore(next_position)
+        for move in position.available_moves():
+            next_position = position.clone()
+            next_position.make_move(move)
+            if not explore(next_position):
+                return False
+        return True
+
+    assert explore(GameBoard())
