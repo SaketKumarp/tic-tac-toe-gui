@@ -48,6 +48,12 @@ class TicTacToeApp(ctk.CTk):
         self._show_menu()
 
     def _clear_screen(self) -> None:
+        if getattr(self, "confetti_after_id", None):
+            try:
+                self.after_cancel(self.confetti_after_id)
+            except Exception:
+                pass
+            self.confetti_after_id = None
         for child in self.winfo_children():
             child.destroy()
         self.buttons = []
@@ -150,7 +156,7 @@ class TicTacToeApp(ctk.CTk):
         self.status_label.pack(pady=(30, 8))
         self.result_label = ctk.CTkLabel(frame, text="", font=("Helvetica", 14), text_color=WIN_COLOR)
         self.result_label.pack(pady=(0, 10))
-        self.celebration_canvas = Canvas(frame, width=500, height=52, bg=BG,
+        self.celebration_canvas = Canvas(frame, width=500, height=96, bg=BG,
                                          highlightthickness=0, bd=0)
         self.celebration_canvas.pack_forget()
         self.confetti_particles: list[dict] = []
@@ -235,12 +241,24 @@ class TicTacToeApp(ctk.CTk):
                 self.buttons[index].configure(text_color="#ffd166", fg_color="#3b3040")
             self._start_confetti()
             self._animate_winning_line()
+            self._pulse_winner_banner(0)
             play_sound(self, self.sound_enabled, kind="win")
 
         self.saved_data = record_result(result, self.names, self.mode)
         self._update_labels()
         for button in self.buttons:
             button.configure(hover=False)
+
+    def _pulse_winner_banner(self, step: int) -> None:
+        """Give the winner banner a brief celebratory glow pulse."""
+        if not self.result_label.winfo_exists() or step >= 8:
+            return
+        colors = ["#ffd166", "#fff3bf", "#ffb703", "#fff3bf"]
+        self.result_label.configure(
+            text_color=colors[step % len(colors)],
+            font=("Helvetica", 17 if step % 2 else 19, "bold"),
+        )
+        self.after(180, lambda: self._pulse_winner_banner(step + 1))
 
     def _start_confetti(self) -> None:
         """Show a short burst of falling confetti below the result message."""
@@ -251,32 +269,44 @@ class TicTacToeApp(ctk.CTk):
         self.confetti_particles = [
             {
                 "x": random.randint(8, 492),
-                "y": random.randint(-52, 0),
-                "speed": random.uniform(2.0, 5.5),
-                "drift": random.uniform(-1.8, 1.8),
-                "size": random.randint(4, 8),
+                "y": random.uniform(20, 96),
+                "vx": random.uniform(-3.4, 3.4),
+                "vy": random.uniform(-6.5, -1.0),
+                "size": random.randint(4, 9),
                 "color": random.choice(colors),
+                "rotation": random.uniform(0, 6.28),
             }
             for _ in range(65)
         ]
         self._animate_confetti(0)
 
     def _animate_confetti(self, frame: int) -> None:
+        """Animate a colorful burst of confetti and firework-like sparkles."""
         if not self.winfo_exists() or not self.celebration_canvas.winfo_exists():
             return
+
         canvas = self.celebration_canvas
         canvas.delete("confetti")
         for particle in self.confetti_particles:
-            particle["y"] += particle["speed"]
-            particle["x"] += particle["drift"]
-            if particle["y"] > 56:
-                particle["y"] = random.randint(-18, -4)
-                particle["x"] = random.randint(8, 492)
+            particle["x"] += particle["vx"]
+            particle["y"] += particle["vy"]
+            particle["vy"] += 0.16
+            particle["rotation"] += 0.18
+
             x, y, size = particle["x"], particle["y"], particle["size"]
-            canvas.create_oval(x, y, x + size, y + size,
-                               fill=particle["color"], outline="", tags="confetti")
-        if frame < 44 and self.board.winner:
-            self.confetti_after_id = self.after(35, lambda: self._animate_confetti(frame + 1))
+            # Tiny angled rectangles look like pieces of falling party confetti.
+            dx = size * 0.65
+            dy = size * 0.25
+            canvas.create_polygon(
+                x, y, x + dx, y + dy, x + dx * 0.65, y + size,
+                x - dx * 0.3, y + size * 0.7,
+                fill=particle["color"], outline="", tags="confetti",
+            )
+
+        if frame < 78 and self.board.winner:
+            self.confetti_after_id = self.after(
+                30, lambda: self._animate_confetti(frame + 1)
+            )
         else:
             canvas.delete("confetti")
             canvas.pack_forget()
