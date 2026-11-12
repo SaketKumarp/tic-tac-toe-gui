@@ -290,10 +290,8 @@ class TicTacToeApp(ctk.CTk):
     def _undo(self) -> None:
         if not self.board.move_history or self.board.is_over:
             return
-        for _ in range(1):
-            index = self.board.undo_move()
-            if index is None:
-                break
+        index = self.board.undo_move()
+        if index is not None:
             self.buttons[index].configure(text="", text_color=TEXT, fg_color="#252d40", hover=True)
         if self.win_canvas:
             self.win_canvas.destroy()
