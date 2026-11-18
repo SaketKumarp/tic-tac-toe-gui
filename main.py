@@ -1,7 +1,7 @@
 """Simple two-player Tic Tac Toe game using Tkinter."""
 
 import tkinter as tk
-from tkinter import messagebox
+
 
 # Game data
 board = [""] * 9
