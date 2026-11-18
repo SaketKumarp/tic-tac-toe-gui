@@ -11,6 +11,7 @@ A two-player desktop Tic-Tac-Toe game built with Python and Tkinter.
 - Persistent player statistics and recent match history
 - Leaderboard ordered by wins
 - New match and return-to-menu actions
+- Welcome, match-start, win and draw sound effects (generated locally; no audio downloads)
 
 ## Requirements
 
@@ -46,6 +47,7 @@ tic-tac-toe-gui/
 │   ├── __init__.py
 │   ├── logic.py
 │   ├── storage.py
+│   ├── sound.py
 │   └── ui.py
 ├── scores.json       # created automatically
 ├── requirements.txt
