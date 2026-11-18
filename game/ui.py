@@ -5,6 +5,7 @@ from tkinter import messagebox
 
 from game.logic import TicTacToeGame
 from game.storage import ScoreStorage
+from game.sound import SoundEffects
 
 
 class TicTacToeApp:
@@ -26,6 +27,7 @@ class TicTacToeApp:
         self.root.configure(bg=self.BG)
 
         self.storage = ScoreStorage()
+        self.sound = SoundEffects(fallback=self.root.bell)
         self.game = TicTacToeGame()
         self.player_x = ""
         self.player_o = ""
@@ -33,6 +35,7 @@ class TicTacToeApp:
         self.screen = None
 
         self.show_welcome()
+        self.sound.play('enter')
 
     def _clear_screen(self):
         if self.screen:
@@ -122,6 +125,7 @@ class TicTacToeApp:
         self.show_game()
 
     def show_game(self):
+        self.sound.play('start')
         self._clear_screen()
         self._label(self.screen, "MATCH IN PROGRESS", 11, self.ACCENT, True).pack(pady=(0, 12))
 
@@ -190,6 +194,7 @@ class TicTacToeApp:
             self._update_turn()
 
     def show_result(self, result):
+        self.sound.play('win' if result == 'win' else 'draw')
         self._clear_screen()
 
         if result == "win":
