@@ -1,54 +1,57 @@
-# Tic Tac Toe Game
+# Tic Tac Toe — Two Player Edition
 
-A simple two-player Tic-Tac-Toe game built with Python and Tkinter. Both players play on the same computer.
+A two-player desktop Tic-Tac-Toe game built with Python and Tkinter.
+
+## Features
+
+- Welcome screen with names for both players
+- Separate game and match-result screens
+- Alternating X and O turns with occupied-cell protection
+- Win and draw detection
+- Persistent player statistics and recent match history
+- Leaderboard ordered by wins
+- New match and return-to-menu actions
 
 ## Requirements
 
-- Python 3
-- Tkinter (usually included with Python)
+- Python 3.9+
+- Tkinter (included with most standard Python installations)
+- No third-party packages
 
-No third-party packages are required.
+## Run
 
-## Run the game
-
-1. Clone or download this repository.
-2. Open a terminal in the project folder.
-3. Run:
+From the project root:
 
 ```bash
 python main.py
 ```
 
-On Windows, you can also use:
+On macOS, if you use the project's virtual environment:
 
 ```bash
-py main.py
+source .venv/bin/activate
+python main.py
 ```
 
-## How to play
+## Storage
 
-1. Player X starts the game.
-2. Players take turns clicking an empty cell.
-3. The first player to make three marks in a row, column, or diagonal wins.
-4. If all nine cells are filled and nobody wins, the game is a draw.
-5. Click **New Game** to clear the board. The score is retained.
-
-## Concepts demonstrated
-
-- Tkinter window and grid layout
-- Button click event handling
-- Lists to store the nine board cells
-- Loops and conditional statements
-- Functions
-- Turn switching
-- Win and draw detection
-- Score tracking
+The game creates `scores.json` in the project root after the first completed match. It stores player games, wins, draws and the most recent 100 match records. Keep this file if you want to preserve statistics.
 
 ## Project structure
 
 ```text
 tic-tac-toe-gui/
 ├── main.py
+├── game/
+│   ├── __init__.py
+│   ├── logic.py
+│   ├── storage.py
+│   └── ui.py
+├── scores.json       # created automatically
 ├── requirements.txt
 └── README.md
 ```
+
+## Concepts demonstrated
+
+Tkinter frames and widgets, grid layout, event callbacks, classes, lists, loops, conditionals, JSON file handling, and separation of UI, game logic and storage.
