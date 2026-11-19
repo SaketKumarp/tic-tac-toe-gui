@@ -54,6 +54,46 @@ tic-tac-toe-gui/
 └── README.md
 ```
 
+## Game flow diagram
+
+The application is event-driven: Tkinter's `mainloop()` waits for user actions, and button callbacks handle each move.
+
+```mermaid
+flowchart TD
+    A([Start]) --> B[main.py: create Tk root]
+    B --> C[Create TicTacToeApp]
+    C --> D[Initialize game, storage and sound]
+    D --> E[Show welcome screen]
+    E --> F{User selects an action}
+    F -->|Start Game| G[Read and validate player names]
+    G --> H{Names valid and different?}
+    H -->|No| I[Show validation message]
+    I --> E
+    H -->|Yes| J[Reset board and set current player to X]
+    J --> K[Show game screen and create 9 buttons]
+    K --> L[Wait for a cell click]
+    L --> M[make_move(position)]
+    M --> N[game.play(position)]
+    N --> O{Move valid?}
+    O -->|No| L
+    O -->|Yes| P[Place current player's mark]
+    P --> Q{Winning combination found?}
+    Q -->|Yes| R[Set winner and finish game]
+    Q -->|No| S{Board full?}
+    S -->|Yes| T[Finish game as a draw]
+    S -->|No| U[Switch X/O turn and update turn label]
+    U --> L
+    R --> V[Save match statistics]
+    T --> V
+    V --> W[Show result screen and play result sound]
+    W --> X{User selects an action}
+    X -->|Play Again| J
+    X -->|Leaderboard / History| Y[Show saved statistics]
+    Y --> Z[Return to welcome screen]
+    X -->|Main Menu| Z
+    F -->|Leaderboard / History| Y
+```
+
 ## Concepts demonstrated
 
 Tkinter frames and widgets, grid layout, event callbacks, classes, lists, loops, conditionals, JSON file handling, and separation of UI, game logic and storage.
