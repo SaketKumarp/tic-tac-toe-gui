@@ -1,3 +1,4 @@
+
 # Tic Tac Toe — Two Player Edition
 
 A two-player desktop Tic-Tac-Toe game built with Python and Tkinter.
@@ -55,7 +56,7 @@ tic-tac-toe-gui/
 ```
 
 ## Game flow diagram
-
+<img width="3654" height="2378" alt="mermaid-diagram" src="https://github.com/user-attachments/assets/eafb03cf-84cb-460d-a3dd-c4e7cfe2f4e1" />
 The application is event-driven: Tkinter's `mainloop()` waits for user actions, and button callbacks handle each move.
 
 ```mermaid
